@@ -40,6 +40,9 @@ public class TileBuilder : MonoBehaviour
 
         var currentPos = mainCamera.ScreenToWorldPoint(Input.mousePosition);
         var tilePos = planTilemap.WorldToCell(currentPos);
+
+        tilePos = ValidatePos(tilePos, false);
+        
         planTilemap.SetTile(tilePos, currentTile);
         if (previousPos != null && previousPos != tilePos)
             planTilemap.SetTile(previousPos.Value, null);
@@ -50,9 +53,7 @@ public class TileBuilder : MonoBehaviour
         {
             planTilemap.SetTile(tilePos, null);
 
-            Debug.Log(usedCells.Contains(tilePos));
-            while (usedCells.Contains(tilePos))
-                tilePos = new Vector3Int(tilePos.x, tilePos.y, tilePos.z + 2);
+            tilePos = ValidatePos(tilePos);
 
             usedCells.Add(tilePos);
 
@@ -60,5 +61,15 @@ public class TileBuilder : MonoBehaviour
             currentTile = null;
             Debug.Log("Set tile on " + tilePos);
         }
+    }
+
+    private Vector3Int ValidatePos(Vector3Int pos, bool saveNewCell = true)
+    {
+        while (usedCells.Contains(pos))
+            pos = new Vector3Int(pos.x, pos.y, pos.z + 2);
+
+        if (saveNewCell)
+            usedCells.Add(pos);
+        return pos;
     }
 }
